@@ -25,15 +25,11 @@ part2 :-
 % that is as long as the first piece should be.
 first(Codes, K, Fst) :-
     length(Codes, NCodes),
-    prefix(FstCodes, Codes),
-    length(FstCodes, L),
-    NCodes #= K*L,
-    number_codes(Fst, FstCodes).
-first(Codes, K, Fst) :-
-    length(Codes, NCodes),
     L #= div(NCodes, K),
-    K*L #\= NCodes,
-    Fst #= 10^L.
+    (
+	NCodes #= K*L -> prefix(FstCodes, Codes), length(FstCodes, L), number_codes(Fst, FstCodes)
+    ;   Fst #= 10^L
+    ).
 
 % Ls is the K-fold concatenation of L with itself.
 repeat(L, K, Ls) :- repeat_(L, K, Ls, []).
