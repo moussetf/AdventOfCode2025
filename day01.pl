@@ -2,8 +2,8 @@
 :- use_module(library(apply), [foldl/4]).
 :- use_module(library(pure_input), [phrase_from_stream/2]).
 
-parse([N|Ns]) --> "R", integer(N), eol, parse(Ns).
-parse([N|Ns]) --> "L", integer(M), {N is -M}, eol, parse(Ns).
+parse([N|Ns]) --> "R", integer(N), blanks, parse(Ns).
+parse([N|Ns]) --> "L", integer(M), {N is -M}, blanks, parse(Ns).
 parse([]) --> eos.
 
 solve(Pred) :-
