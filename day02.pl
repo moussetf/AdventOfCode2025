@@ -3,10 +3,8 @@
 :- use_module(library(lists)).
 :- use_module(library(pure_input), [phrase_from_stream/2]).
 
-parse([A-B|Ranges]) --> 
-    digits(A), "-", digits(B), ",", parse(Ranges).
-parse([A-B]) --> 
-    digits(A), "-", digits(B), blanks.
+parse([A-B|Ranges]) --> digits(A), "-", digits(B), ",", parse(Ranges).
+parse([A-B]) --> digits(A), "-", digits(B), blanks.
 
 part1 :-
     current_input(Stdin), phrase_from_stream(parse(Ranges), Stdin),
