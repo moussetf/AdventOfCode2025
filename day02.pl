@@ -34,7 +34,7 @@ first(Codes, K, Fst) :-
 % Ls is the K-fold concatenation of L with itself.
 repeat(L, K, Ls) :- repeat_(L, K, Ls, []).
 repeat_(_, 0) --> [].
-repeat_(L, K) --> {K #> 0, N #= K-1}, L, repeat_(L, N).
+repeat_(L, K) --> {K #> 0, K1 #= K-1}, L, repeat_(L, K1).
 
 % True if N is an invalid number (with multiplicity K) for one of the
 % given ranges.
