@@ -27,7 +27,10 @@ first(Codes, K, Fst) :-
     length(Codes, NCodes),
     L #= div(NCodes, K),
     (
-        NCodes #= K*L -> prefix(FstCodes, Codes), length(FstCodes, L), number_codes(Fst, FstCodes)
+        NCodes #= K*L ->
+            prefix(FstCodes, Codes),
+            length(FstCodes, L),
+            number_codes(Fst, FstCodes)
     ;   Fst #= 10^L
     ).
 
