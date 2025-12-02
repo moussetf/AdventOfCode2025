@@ -10,13 +10,15 @@ part1 :-
     current_input(Stdin), phrase_from_stream(parse(Ranges), Stdin),
     findall(X, invalid_number(Ranges, 2, X), Xs),
     list_to_set(Xs, Set),
-    sum_list(Set, N), write(N), nl, halt.
+    sum_list(Set, Sum),
+    write(Sum), nl, halt.
 
 part2 :-
     current_input(Stdin), phrase_from_stream(parse(Ranges), Stdin),
     findall(X, invalid_number(Ranges, _, X), Xs),
     list_to_set(Xs, Set),
-    sum_list(Set, N), write(N), nl, halt.
+    sum_list(Set, Sum),
+    write(Sum), nl, halt.
 
 % Either Codes splits perfectly into K pieces and Fst is the first
 % piece (as a number), or it doesn't, and Fst is the power of 10
@@ -25,7 +27,8 @@ first(Codes, K, Fst) :-
     length(Codes, NCodes),
     prefix(FstCodes, Codes),
     length(FstCodes, L),
-    NCodes #= K*L, number_codes(Fst, FstCodes).
+    NCodes #= K*L,
+    number_codes(Fst, FstCodes).
 first(Codes, K, Fst) :-
     length(Codes, NCodes),
     L #= div(NCodes, K),
