@@ -44,14 +44,13 @@ repeat_(L, K) --> {K #> 0, N #= K-1}, L, repeat_(L, N).
 % given ranges.
 invalid_number(Ranges, K, N) :-
     member(A-B, Ranges),
-    length(B, MaxLen),
-    between(2, MaxLen, K),
-    number_codes(NumA, A),
-    number_codes(NumB, B),
+    length(B, MaxLen), between(2, MaxLen, K),
     first(A, K, FstA),
     first(B, K, FstB),
-    between(FstA, FstB, Prefix),
-    number_codes(Prefix, PrefixCodes),
-    repeat(PrefixCodes, K, Codes),
+    between(FstA, FstB, Piece),
+    number_codes(Piece, PieceCodes),
+    repeat(PieceCodes, K, Codes),
     number_codes(N, Codes),
+    number_codes(NumA, A),
+    number_codes(NumB, B),
     between(NumA, NumB, N).
