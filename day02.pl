@@ -1,5 +1,4 @@
 :- use_module(library(dcg/basics)).
-:- use_module(library(clpfd)).
 :- use_module(library(lists)).
 :- use_module(library(pure_input), [phrase_from_stream/2]).
 
@@ -25,19 +24,19 @@ part2 :-
 % that is as long as the first piece should be.
 first(Codes, K, Fst) :-
     length(Codes, NCodes),
-    L #= div(NCodes, K),
+    L is div(NCodes, K),
     (
-        NCodes #= K*L ->
+        NCodes is K*L ->
             prefix(FstCodes, Codes),
             length(FstCodes, L),
             number_codes(Fst, FstCodes)
-    ;   Fst #= 10^L
+    ;   Fst is 10^L
     ).
 
 % Ls is the K-fold concatenation of L with itself.
 repeat(L, K, Ls) :- repeat_(L, K, Ls, []).
 repeat_(_, 0) --> [].
-repeat_(L, K) --> {K #> 0, K1 #= K-1}, L, repeat_(L, K1).
+repeat_(L, K) --> {K > 0, K1 is K-1}, L, repeat_(L, K1).
 
 % True if N is an invalid number (with multiplicity K) for one of the
 % given ranges.
