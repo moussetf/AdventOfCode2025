@@ -29,7 +29,6 @@ remove_until_done(Rolls, N, Acc) :-
     (N1 is 0 -> N is Acc; Acc1 is Acc + N1, remove_until_done(Rolls1, N, Acc1)).
 
 main :-
-    open('/home/frank/documents/AdventOfCode2025/day04.in', read, Stream),
-    phrase_from_stream(parse(Rolls), Stream),
+    current_input(Stream), phrase_from_stream(parse(Rolls), Stream),
     remove_accessible(Rolls, _, Part1), write(Part1), nl,
     remove_until_done(Rolls, Part2, 0), write(Part2), nl.
