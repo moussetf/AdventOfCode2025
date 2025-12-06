@@ -40,7 +40,6 @@ gen_fresh([From-To|Intervals], Tree) -->
     gen_fresh(Intervals, Tree).
 gen_fresh([], _) --> [].
     
-
 count_fresh_part2([], 0).
 count_fresh_part2([A-B], Count) :- Count is 1+B-A.
 count_fresh_part2([A-B,A1-B1|Intervals], Count) :-
