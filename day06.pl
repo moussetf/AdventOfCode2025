@@ -1,4 +1,4 @@
-:- autoload(library(dcg/basics), [blanks/2, eos/2, integer/3, string_without/4, eol/2]).
+:- autoload(library(dcg/basics), [blanks/2, eos/2, integer/3, string_without/4]).
 :- autoload(library(clpfd), [transpose/2]).
 :- autoload(library(apply), [maplist/4, foldl/4, maplist/3]).
 :- use_module(library(yall), [(>>)/5, (>>)/4]).
@@ -8,7 +8,8 @@
 times(A, B, C) :- C is A*B.
 plus(A, B, C) :- C is A+B.
 
-parse_lines([Line|Lines]) --> string_without("\n", Line), { length(Line, L), L > 1}, eol, parse_lines(Lines).
+parse_lines([Line|Lines]) -->
+    string_without("\n", Line), "\n", parse_lines(Lines).
 parse_lines([]) --> eos.
 
 parse_part1([N|Ns]) --> blanks, integer(N), blanks, parse_part1(Ns).
