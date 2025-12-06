@@ -30,8 +30,7 @@ part2_fold(Row, Acc-Op-Unit, Acc-Op-Unit1) :-
     call(Op, Unit, Num, Unit1).
 
 main :-
-    open('/home/frank/documents/AdventOfCode2025/day06.in', read, Stdin),
-    phrase_from_stream(parse_lines(Lines), Stdin),
+    current_input(Stdin), phrase_from_stream(parse_lines(Lines), Stdin),
     maplist([Line, Row]>>(phrase(parse_part1(Row), Line)), Lines, AllRows),
     reverse(AllRows, [Ops|Rows]),
     transpose(Rows, RowsT),
