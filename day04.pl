@@ -10,8 +10,8 @@ parse(Rolls0, Rolls1, X-Y) --> "@", { X1 is X+1, put_assoc(X-Y, Rolls0, _, Assoc
 parse(Rolls0, Rolls1, _-Y) --> "\n", blanks, { Y1 is Y+1 }, parse(Rolls0, Rolls1, 0-Y1).
 parse(Rolls, Rolls, _-_) --> eos.
 
-neighbour(X1-Y1, X2-Y1) :- X2 is X1+1; X2 is X1-1.
-neighbour(X1-Y1, X1-Y2) :- Y2 is Y1+1; Y2 is Y1-1.
+neighbour(X1-Y, X2-Y) :- X2 is X1+1; X2 is X1-1.
+neighbour(X-Y1, X-Y2) :- Y2 is Y1+1; Y2 is Y1-1.
 neighbour(X1-Y1, X2-Y2) :- (X2 is X1+1; X2 is X1-1), (Y2 is Y1+1; Y2 is Y1-1).
 
 accessible(Rolls, Roll) :-
@@ -29,6 +29,6 @@ remove_until_done(Rolls, N, Acc) :-
     (N1 is 0 -> N is Acc; Acc1 is Acc + N1, remove_until_done(Rolls1, N, Acc1)).
 
 main :-
-    current_input(Stream), phrase_from_stream(parse(Rolls), Stream),
+    current_input(Stdin), phrase_from_stream(parse(Rolls), Stdin),
     remove_accessible(Rolls, _, Part1), write(Part1), nl,
-    remove_until_done(Rolls, Part2, 0), write(Part2), nl.
+    remove_until_done(Rolls, Part2, 0), write(Part2), nl, halt.
