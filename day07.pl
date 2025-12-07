@@ -37,9 +37,8 @@ part2(Beam, [Ss|Splitters], Count) :-
         Count is Count1+Count2
     ;   part2(Beam, Splitters, Count)
     ).
-    
 
-main :- 
+main :-
     current_input(Stdin), phrase_from_stream(parse(Start, Splitters), Stdin),
     foldl(part1_fold, Splitters, [Start]-0, _-Part1),
     write(Part1), nl,
