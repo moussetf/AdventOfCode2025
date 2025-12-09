@@ -24,11 +24,11 @@ list_to_uf(List, uf(L, Parent)) :-
 
 uf_find(uf(N, Parent), A, A-Rank, uf(N, Parent)) :-
     get_assoc(A, Parent, A-Rank).
-uf_find(uf(N, Parent), A, Root, uf(N, Parent1)) :-
+uf_find(uf(N, Parent), A, Root-Rank, uf(N, Parent1)) :-
     get_assoc(A, Parent, P-_),
     A \= P,
-    uf_find(uf(N, Parent), P, Root, uf(_, Tmp)),
-    put_assoc(A, Tmp, Root, Parent1).
+    uf_find(uf(N, Parent), P, Root-Rank, uf(_, Tmp)),
+    put_assoc(A, Tmp, Root-Rank, Parent1).
 
 uf_component_sizes(UF, ComponentSizes) :-
     uf(_, Parent) = UF,
@@ -47,7 +47,7 @@ uf_union(UF, A, B, uf(M, Parent1)) :-
     RootA \= RootB,
     M is N-1,
     (
-	RankA = RankB -> Root = RootA, Rank is 1+RankA
+        RankA = RankB -> Root = RootA, Rank is 1+RankA
     ;   RankA < RankB -> Root-Rank = RootB-RankB 
     ;   RankA > RankB -> Root-Rank = RootA-RankA
     ),
