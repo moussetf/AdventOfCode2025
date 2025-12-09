@@ -30,13 +30,6 @@ uf_find(uf(N, Parent), A, Root-Rank, uf(N, Parent1)) :-
     uf_find(uf(N, Parent), P, Root-Rank, uf(_, Tmp)),
     put_assoc(A, Tmp, Root-Rank, Parent1).
 
-uf_component_sizes(UF, ComponentSizes) :-
-    uf(_, Parent) = UF,
-    assoc_to_keys(Parent, Domain),
-    maplist({UF}/[X, Y]>>uf_find(UF, X, Y-_, _), Domain, Components),
-    msort(Components, SortedComponents),
-    clumped(SortedComponents, ComponentSizes).
-
 uf_union(UF, A, B, UF2) :-
     uf_find(UF, A, Root-_, UF1),
     uf_find(UF1, B, Root-_, UF2).
@@ -54,6 +47,7 @@ uf_union(UF, A, B, uf(M, Parent1)) :-
     put_assoc(RootA, Parent, Root-Rank, Tmp),
     put_assoc(RootB, Tmp, Root-Rank, Parent1).
 
+
 fold_part1(_, 0-UF, 0-UF).
 fold_part1(_-A-B, N-UF, M-UF1) :-
     N > 0,
@@ -66,7 +60,11 @@ fold_part2(_-A-B, _-_-UF, A-B-UF1) :-
     uf_union(UF, A, B, UF1).
 
 top_3_product(UF, N) :-
-    uf_component_sizes(UF, ComponentSizes),
+    uf(_, Parent) = UF,
+    assoc_to_keys(Parent, Domain),
+    maplist({UF}/[X, Y]>>uf_find(UF, X, Y-_, _), Domain, Components),
+    msort(Components, SortedComponents),
+    clumped(SortedComponents, ComponentSizes),
     transpose_pairs(ComponentSizes, SizeComponents),
     keysort(SizeComponents, S),
     reverse(S, [A-_,B-_,C-_|_]),
