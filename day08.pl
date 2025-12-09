@@ -47,7 +47,6 @@ uf_union(UF, A, B, uf(M, Parent1)) :-
     put_assoc(RootA, Parent, Root-Rank, Tmp),
     put_assoc(RootB, Tmp, Root-Rank, Parent1).
 
-
 fold_part1(_, 0-UF, 0-UF).
 fold_part1(_-A-B, N-UF, M-UF1) :-
     N > 0,
