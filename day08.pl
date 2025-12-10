@@ -1,20 +1,26 @@
-:- autoload(library(lists), [nth0/3, clumped/2, reverse/2]).
-:- autoload(library(dcg/basics), [integer/3, blanks/2]).
-:- autoload(library(dcg/high_order) ).
-:- autoload(library(apply), [foldl/4, maplist/3]).
-:- autoload(library(assoc), [get_assoc/3, put_assoc/4, list_to_assoc/2, assoc_to_keys/2]).
+:- use_module(library(lists), [nth0/3, clumped/2, reverse/2]).
+:- use_module(library(dcg/basics), [integer/3, blanks/2]).
+:- use_module(library(dcg/high_order) ).
+:- use_module(library(apply), [foldl/4, maplist/3]).
+:- use_module(library(assoc), [get_assoc/3, put_assoc/4, list_to_assoc/2, assoc_to_keys/2]).
 :- use_module(library(yall), [(>>)/4]).
-:- autoload(library(pairs), [transpose_pairs/2]).
-:- autoload(library(pure_input), [phrase_from_stream/2]).
+:- use_module(library(pairs), [transpose_pairs/2]).
+:- use_module(library(pure_input), [phrase_from_stream/2]).
 
-parse_(X1-X2-X3) --> integer(X1), ",", integer(X2), ",", integer(X3), blanks.
-parse(Ps) --> sequence(parse_, Ps).
+coord(c(X1, X2, X3)) --> integer(X1), ",", integer(X2), ",", integer(X3), blanks.
+parse_coords(Coords) --> sequence(coord, Coords).
 
-graph_edge(List, D-X-Y) :-
-    nth0(X, List, X1-X2-X3),
-    nth0(Y, List, Y1-Y2-Y3),
-    X > Y,
-    D is (X1-Y1)^2 + (X2-Y2)^2 + (X3-Y3)^2.
+sorted_edges(Coords, Edges) :-
+    findall(D-IdxX-IdxY,
+            (
+                nth0(IdxX, Coords, c(X1, X2, X3)),
+                nth0(IdxY, Coords, c(Y1, Y2, Y3)),
+                IdxX > IdxY,
+                D is (X1-Y1)^2 + (X2-Y2)^2 + (X3-Y3)^2
+            )
+           , WeightedEdges),
+    keysort(WeightedEdges, SortedEdges),
+    maplist([_-U-V,U-V]>>(true), SortedEdges, Edges).
 
 % Union-find data structure based on AVL trees
 list_to_uf(List, uf(L, Parent)) :-
@@ -48,14 +54,9 @@ uf_union(UF, A, B, uf(M, Parent1)) :-
     put_assoc(RootB, Tmp, Root-Rank, Parent1).
 
 fold_part1(_, 0-UF, 0-UF).
-fold_part1(_-A-B, N-UF, M-UF1) :-
+fold_part1(A-B, N-UF, M-UF1) :-
     N > 0,
     M is N-1,
-    uf_union(UF, A, B, UF1).
-
-fold_part2(_, A-B-uf(1, P), A-B-uf(1, P)).
-fold_part2(_-A-B, _-_-UF, A-B-UF1) :-
-    uf(N, _) = UF, N > 1,
     uf_union(UF, A, B, UF1).
 
 top_3_product(UF, N) :-
@@ -69,15 +70,21 @@ top_3_product(UF, N) :-
     reverse(S, [A-_,B-_,C-_|_]),
     N is A*B*C.
 
+fold_part2(_, A-B-uf(1, P), A-B-uf(1, P)).
+fold_part2(A-B, _-_-UF, A-B-UF1) :-
+    uf(N, _) = UF, N > 1,
+    uf_union(UF, A, B, UF1).
+
 main :-
-    current_input(Stdin), phrase_from_stream(parse(Parsed), Stdin),
-    findall(Z, graph_edge(Parsed, Z), Edges),
-    findall(X, nth0(X, Parsed, _), Indexes),
-    keysort(Edges , SortedEdges),
+    current_input(Stdin), phrase_from_stream(parse_coords(Coords), Stdin),
+    sorted_edges(Coords, SortedEdges),
+    findall(X, nth0(X, Coords, _), Indexes),
     list_to_uf(Indexes, UF),
     foldl(fold_part1, SortedEdges, 1000-UF, 0-FinalUF),
-    top_3_product(FinalUF, Part1), write(Part1), nl,
+    top_3_product(FinalUF, Part1),
     foldl(fold_part2, SortedEdges, _-_-UF, I-J-_),
-    nth0(I, Parsed, X1-_-_),
-    nth0(J, Parsed, X2-_-_),
-    Part2 is X1*X2, write(Part2), nl, halt.
+    nth0(I, Coords, c(X1, _, _)),
+    nth0(J, Coords, c(X2, _, _)),
+    Part2 is X1*X2,
+    format("~w~n~w~n", [Part1, Part2]),
+    halt.
