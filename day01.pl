@@ -6,13 +6,6 @@ parse([N|Ns]) --> "R", integer(N), blanks, parse(Ns).
 parse([N|Ns]) --> "L", integer(M), {N is -M}, blanks, parse(Ns).
 parse([]) --> eos.
 
-main :-
-    current_input(Stdin),
-    phrase_from_stream(parse(Ns), Stdin),
-    foldl(count_zeroes, Ns, 50-0, _-Part1),
-    foldl(count_crossings, Ns, 50-0, _-Part2),
-    write(Part1), nl, write(Part2), nl, halt.
-
 count_zeroes(Move, Pos-Zs, Pos1-Zs1) :-
     Pos1 is mod(Pos + Move, 100),
     (
@@ -26,3 +19,11 @@ count_crossings(Move, Pos-Zs, Pos1-Zs1) :-
         Move >= 0 -> Zs1 is Zs + div(Pos + Move, 100)
     ;   Zs1 is Zs + div(mod(100 - Pos, 100) - Move, 100)
     ).
+
+main :-
+    current_input(Stdin),
+    phrase_from_stream(parse(Ns), Stdin),
+    foldl(count_zeroes, Ns, 50-0, _-Part1),
+    foldl(count_crossings, Ns, 50-0, _-Part2),
+    format("~w~n~w~n", [Part1, Part2]),
+    halt.
