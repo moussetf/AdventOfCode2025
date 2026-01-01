@@ -23,11 +23,12 @@ parse_name(Name) -->
 :- table num_paths/3.
 num_paths(A, A, 1).
 num_paths(A, B, Num) :-
-    findall(M, (adj(A, Nb), num_paths(Nb, B, M)), Nums), sum_list(Nums, Num).
+    findall(M, (adj(A, Nb), num_paths(Nb, B, M)), Nums),
+    sum_list(Nums, Num).
 
 % Number of paths in DAG containing A,B,C,D in order
-num_paths(A, B, C, D, Sol) :-
-    num_paths(A, B, N1), num_paths(B, C, N2), num_paths(C, D, N3), Sol is N1 * N2 * N3.
+num_paths(A, B, C, D, Num) :-
+    num_paths(A, B, N1), num_paths(B, C, N2), num_paths(C, D, N3), Num is N1 * N2 * N3.
 
 main :-
     retractall(adj(_, _)), 
