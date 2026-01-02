@@ -37,7 +37,7 @@ translate(DX, DY, Shape1, Shape2) :-
 % Translate the shape so that the top-left coordinate is c(0, 0) and the coordinate list is sorted.
 x(c(X, _), X).
 y(c(_, Y), Y).
-normalize(Shape, Normlized) :-
+normalize(Shape, Normalized) :-
     maplist(x, Shape, Xs), min_list(Xs, MinX),
     maplist(y, Shape, Ys), min_list(Ys, MinY),
     DX is -MinX,
@@ -82,6 +82,7 @@ solve(Shapes, Region) :-
     % Stupid check that sorts out all the impossible cases...
     sum_list(Count, CountSum),
     Width * Height >= 7*CountSum,
+    % Even though the input guaranteees it, we still check that there is a solution.
     empty_assoc(Board),
     solve_region(Shapes, Region, 0, 0, Board).
 
