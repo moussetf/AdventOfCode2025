@@ -14,37 +14,36 @@ parse(Shapes, Regions) -->
 parse_region(region(Width, Height, Counts)) -->
     integer(Width), "x", integer(Height), ": ",
     sequence(integer, " ", Counts), blanks.
-parse_shape(shape(Number, Coords)) -->
-    integer(Number), ":", blanks, parse_coords(Coords, c(0,0)).
-parse_coords([c(X,Y)|Coords], c(X,Y)) -->
-    "#", { X1 is X + 1 }, parse_coords(Coords, c(X1, Y)).
-parse_coords(Coords, c(X, Y)) -->
-    ".", { X1 is X + 1 }, parse_coords(Coords, c(X1, Y)).
-parse_coords(Coords, c(X, Y)) -->
-    eol, { X > 0, Y1 is Y + 1 }, parse_coords(Coords, c(0, Y1)).
+parse_shape(Shape) -->
+    integer(_), ":", blanks, parse_coords(Shape, c(0,0)).
+parse_coords([c(X,Y)|Shape], c(X,Y)) -->
+    "#", { X1 is X + 1 }, parse_coords(Shape, c(X1, Y)).
+parse_coords(Shape, c(X, Y)) -->
+    ".", { X1 is X + 1 }, parse_coords(Shape, c(X1, Y)).
+parse_coords(Shape, c(X, Y)) -->
+    eol, { X > 0, Y1 is Y + 1 }, parse_coords(Shape, c(0, Y1)).
 parse_coords([], c(0, _)) --> eol.
 
 % Basic transformations of shapes
-flipY(shape(Number, Coords1), shape(Number, Coords2)) :-
-    maplist([c(X, Y1), c(X, Y2)]>>(Y2 is -Y1), Coords1, Coords2).
-flipX(shape(Number, Coords1), shape(Number, Coords2)) :-
-    maplist([c(X1, Y), c(X2, Y)]>>(X2 is -X1), Coords1, Coords2).
-rot90(shape(Number, Coords1), shape(Number, Coords2)) :-
-    maplist([c(X1, Y1), c(X2, Y2)]>>(X2 is -Y1, Y2 is X1), Coords1, Coords2).
-translate(DX, DY, shape(Number, Coords1), shape(Number, Coords2)) :-
-    maplist({DX, DY}/[c(X1, Y1), c(X2, Y2)]>>(X2 is X1 + DX, Y2 is Y1 + DY), Coords1, Coords2).
+flipY(Shape1, Shape2) :-
+    maplist([c(X, Y1), c(X, Y2)]>>(Y2 is -Y1), Shape1, Shape2).
+flipX(Shape1, Shape2) :-
+    maplist([c(X1, Y), c(X2, Y)]>>(X2 is -X1), Shape1, Shape2).
+rot90(Shape1, Shape2) :-
+    maplist([c(X1, Y1), c(X2, Y2)]>>(X2 is -Y1, Y2 is X1), Shape1, Shape2).
+translate(DX, DY, Shape1, Shape2) :-
+    maplist({DX, DY}/[c(X1, Y1), c(X2, Y2)]>>(X2 is X1 + DX, Y2 is Y1 + DY), Shape1, Shape2).
 
 % Translate the shape so that the top-left coordinate is c(0, 0) and the coordinate list is sorted.
 x(c(X, _), X).
 y(c(_, Y), Y).
-normalize(S1, shape(Number, NormCoords)) :-
-    S1 = shape(_, Coords),
-    maplist(x, Coords, Xs), min_list(Xs, MinX),
-    maplist(y, Coords, Ys), min_list(Ys, MinY),
+normalize(Shape, Normlized) :-
+    maplist(x, Shape, Xs), min_list(Xs, MinX),
+    maplist(y, Shape, Ys), min_list(Ys, MinY),
     DX is -MinX,
     DY is -MinY,
-    translate(DX, DY, S1, shape(Number, Coords1)),
-    sort(Coords1, NormCoords).
+    translate(DX, DY, Shape, Translated),
+    sort(Translated, Normalized).
 
 % Generate all possible variants of a shape
 variant_ -->
@@ -53,9 +52,9 @@ variant_ -->
 :- table variant/2.
 variant(S, Var) :- setof(V, variant_(S, V), Vars), member(Var, Vars).
 
-place(shape(_, Coords), region(Width, Height, _)) -->
-    { maplist({Width, Height}/[c(X, Y)]>>( X < Width, Y < Height ), Coords) },
-    foreach(member(C, Coords), place_coord(C)).
+place(Shape, region(Width, Height, _)) -->
+    { maplist({Width, Height}/[c(X, Y)]>>( X < Width, Y < Height ), Shape) },
+    foreach(member(C, Shape), place_coord(C)).
 place_coord(C, Board1, Board2) :-
     \+ get_assoc(C, Board1, _),
     put_assoc(C, Board1, 1, Board2).
