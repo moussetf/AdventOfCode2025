@@ -29,6 +29,9 @@ remove_until_done(Rolls, N, Acc) :-
     (N1 is 0 -> N is Acc; Acc1 is Acc + N1, remove_until_done(Rolls1, N, Acc1)).
 
 main :-
-    current_input(Stdin), phrase_from_stream(parse(Rolls), Stdin),
-    remove_accessible(Rolls, _, Part1), write(Part1), nl,
-    remove_until_done(Rolls, Part2, 0), write(Part2), nl, halt.
+    current_input(Stdin),
+    phrase_from_stream(parse(Rolls), Stdin),
+    remove_accessible(Rolls, _, Part1),
+    remove_until_done(Rolls, Part2, 0),
+    format("~w~n~w~n", [Part1, Part2]),
+    halt.

@@ -41,10 +41,12 @@ maximum(I-B, K-_-Max, K-I-B) :- I+1 >= K, B > Max.
 maximum(I-B, K-J-Max, K-J-Max) :- I+1 >= K, Max >= B.
 
 main :-
-    current_input(Stdin), phrase_from_stream(parse(Banks), Stdin),
+    current_input(Stdin),
+    phrase_from_stream(parse(Banks), Stdin),
     maplist([B, Z]>>joltage(B, 2, Z), Banks, Part1s),
     sum_list(Part1s, Part1),
     maplist([B, Z]>>joltage(B, 12, Z), Banks, Part2s),
     sum_list(Part2s, Part2),
-    write(Part1), nl, write(Part2), nl, halt.
+    format("~w~n~w~n", [Part1, Part2]),
+    halt.
 

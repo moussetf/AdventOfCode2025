@@ -32,7 +32,8 @@ num_paths(A, B, C, D, Num) :-
 
 main :-
     retractall(adj(_, _)), 
-    current_input(Stdin), phrase_from_stream(parse_graph, Stdin),
+    current_input(Stdin),
+    phrase_from_stream(parse_graph, Stdin),
     num_paths(you, out, Part1),
     num_paths(svr, dac, fft, out, Part2a),
     num_paths(svr, fft, dac, out, Part2b),

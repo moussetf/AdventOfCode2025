@@ -76,7 +76,8 @@ fold_part2(A-B, _-_-UF, A-B-UF1) :-
     uf_union(UF, A, B, UF1).
 
 main :-
-    current_input(Stdin), phrase_from_stream(parse_coords(Coords), Stdin),
+    current_input(Stdin),
+    phrase_from_stream(parse_coords(Coords), Stdin),
     sorted_edges(Coords, SortedEdges),
     findall(X, nth0(X, Coords, _), Indexes),
     list_to_uf(Indexes, UF),

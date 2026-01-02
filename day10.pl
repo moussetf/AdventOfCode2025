@@ -40,10 +40,10 @@ shortest_solution_part1(mach(Lights, Buttons, _), N) :-
 % We use the linear programming solver for part 2.
 solution_part2(Machine, Sol) :-
     gen_state(State0),
-    solve_part2_lp(Machine, State0, State1),
+    part2_lp(Machine, State0, State1),
     objective(State1, Sol).
 
-solve_part2_lp(mach(_, Buttons, Joltages)) -->
+part2_lp(mach(_, Buttons, Joltages)) -->
     { length(Buttons, Length), L is Length - 1, findall(p(Idx), between(0, L, Idx), NumPresses) },
     foreach(member(P, NumPresses), constraint([P] >= 0)),
     foreach(member(P, NumPresses), constraint(integral(P))),
@@ -61,7 +61,8 @@ button_presses_match(Buttons, [J|Joltages], Current) -->
 button_presses_match(_, [], _, S, S).
 
 main :-
-    current_input(Stdin), phrase_from_stream(parse_machines(Machs), Stdin),
+    current_input(Stdin),
+    phrase_from_stream(parse_machines(Machs), Stdin),
     maplist(shortest_solution_part1, Machs, Sols1), sum_list(Sols1, Part1),
     maplist(solution_part2, Machs, Sols2), sum_list(Sols2, Part2),
     format("~w~n~w~n", [Part1, Part2]),

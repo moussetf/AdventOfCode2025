@@ -39,8 +39,9 @@ part2(Beam, [Ss|Splitters], Count) :-
     ).
 
 main :-
-    current_input(Stdin), phrase_from_stream(parse(Start, Splitters), Stdin),
+    current_input(Stdin),
+    phrase_from_stream(parse(Start, Splitters), Stdin),
     foldl(part1_fold, Splitters, [Start]-0, _-Part1),
-    write(Part1), nl,
     part2(Start, Splitters, Part2),
-    write(Part2), nl, halt.
+    format("~w~n~w~n", [Part1, Part2]),
+    halt.

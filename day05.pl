@@ -39,7 +39,7 @@ gen_fresh([From-To|Intervals], Tree) -->
     Range,
     gen_fresh(Intervals, Tree).
 gen_fresh([], _) --> [].
-    
+
 count_fresh_part2([], 0).
 count_fresh_part2([A-B], Count) :- Count is 1+B-A.
 count_fresh_part2([A-B,A1-B1|Intervals], Count) :-
@@ -54,9 +54,10 @@ count_fresh_part2([A-B,A1-B1|Intervals], Count) :-
     Count is Count1+1+B-A.
 
 main :-
-    current_input(Stdin), phrase_from_stream(parse(Intervals, Ids), Stdin),
+    current_input(Stdin),
+    phrase_from_stream(parse(Intervals, Ids), Stdin),
     random_search_tree(Ids, Tree),
     count_fresh_part1(Intervals, Tree, Part1),
-    write(Part1), nl,
     sort(Intervals, Sorted), count_fresh_part2(Sorted, Part2),
-    write(Part2), nl, halt.
+    format("~w~n~w~n", [Part1, Part2]),
+    halt.

@@ -33,19 +33,6 @@ sort_rectangles_by_area(Rectangles, SortedRectangles) :-
     reverse(SortedPairs, SortedPairs1),
     pairs_values(SortedPairs1, SortedRectangles).
 
-main :-
-    current_input(Stdin), phrase_from_stream(parse_coords(Coords), Stdin),
-    rectangles(Coords, Rectangles),
-    maplist(rectangle_area, Rectangles, Areas),
-    max_member(Part1, Areas),
-    polygon(Coords, Polygon),
-    sort_rectangles_by_area(Rectangles, SortedRectangles),
-    member(Rectangle, SortedRectangles),
-    polygon_contains_rectangle(Polygon, Rectangle),
-    rectangle_area(Rectangle, Part2),
-    format("~w~n~w~n", [Part1, Part2]),
-    halt.
-
 % The main idea for part 2 is to compute various points of interest
 % such that the rectangle is contained in the polygon iff all the
 % points of interest are. These points of interest are the corners
@@ -115,3 +102,18 @@ inside(Polygon, P) :-
     maplist(angle(P), Polygon, Angles),
     sum_list(Angles, Angle),
     abs(Angle) > pi.
+
+main :-
+    current_input(Stdin),
+    phrase_from_stream(parse_coords(Coords), Stdin),
+    rectangles(Coords, Rectangles),
+    maplist(rectangle_area, Rectangles, Areas),
+    max_member(Part1, Areas),
+    polygon(Coords, Polygon),
+    sort_rectangles_by_area(Rectangles, SortedRectangles),
+    member(Rectangle, SortedRectangles),
+    polygon_contains_rectangle(Polygon, Rectangle),
+    rectangle_area(Rectangle, Part2),
+    format("~w~n~w~n", [Part1, Part2]),
+    halt.
+

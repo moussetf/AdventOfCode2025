@@ -5,8 +5,8 @@
 :- autoload(library(lists), [sum_list/2, reverse/2]).
 :- autoload(library(pure_input), [phrase_from_stream/2]).
 
-times(A, B, C) :- C is A*B.
-plus(A, B, C) :- C is A+B.
+times(A, B, C) :- C is A * B.
+plus(A, B, C) :- C is A + B.
 
 parse_lines([Line|Lines]) -->
     string_without("\n", Line), "\n", parse_lines(Lines).
@@ -31,14 +31,15 @@ part2_fold(Row, Acc-Op-Unit, Acc-Op-Unit1) :-
     call(Op, Unit, Num, Unit1).
 
 main :-
-    current_input(Stdin), phrase_from_stream(parse_lines(Lines), Stdin),
+    current_input(Stdin),
+    phrase_from_stream(parse_lines(Lines), Stdin),
     maplist([Line, Row]>>(phrase(parse_part1(Row), Line)), Lines, AllRows),
     reverse(AllRows, [Ops|Rows]),
     transpose(Rows, RowsT),
     maplist([Op-Unit, Row, X]>>(foldl(Op, Row, Unit, X)), Ops, RowsT, Ns),
     sum_list(Ns, Part1),
-    write(Part1), nl,
     transpose(Lines, LinesT),
     foldl(part2_fold, LinesT, 0-plus-0,  A-_-B),
     Part2 is A + B,
-    write(Part2), nl, halt.
+    format("~w~n~w~n", [Part1, Part2]),
+    halt.
