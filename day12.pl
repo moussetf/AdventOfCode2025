@@ -54,34 +54,29 @@ variant_ -->
 variant(S, Var) :- setof(V, variant_(S, V), Vars), member(Var, Vars).
 
 place(shape(_, Coords), region(Width, Height, _)) -->
-    { maplist({Width, Height}/[c(X, Y)]>>(X < Width, Y < Height), Coords) },
+    { maplist({Width, Height}/[c(X, Y)]>>( X < Width, Y < Height ), Coords) },
     foreach(member(C, Coords), place_coord(C)).
-
 place_coord(C, Board1, Board2) :-
     \+ get_assoc(C, Board1, _),
     put_assoc(C, Board1, 1, Board2).
 
+solve_region([], _, _, _, _).
 solve_region([_|Shapes], region(Width, Height, [0|Counts]), _, _, Board) :-
     solve_region(Shapes, region(Width, Height, Counts), 0, 0, Board).
-solve_region(Shapes, region(Width, Height, [Count|Counts]), Width, Y, Board) :-
-    Count > 0,
-    Height > Y, Y >= 0,
-    Y1 is Y + 1,
-    solve_region(Shapes, region(Width, Height, [Count|Counts]), 0, Y1, Board).
-solve_region([], _, _, _, _).
 solve_region([S|Shapes], region(Width, Height, [Count|Counts]), X, Y, Board) :-
     Count > 0,
     Width > X, X >= 0,
     Height > Y, Y >= 0,
-    X1 is X + 1,
+    X1 is mod(X + 1, Width),
+    Y1 is Y + (X + 1) // Width,
     (
+        Count1 is Count - 1,
         variant(S, Var),
         translate(X, Y, Var, TS),
-        place(TS, region(Width, Height, [Count|Counts]), Board, Board1),
-        Count1 is Count - 1,
-        solve_region([S|Shapes], region(Width, Height, [Count1|Counts]), X1, Y, Board1)
-    ;   solve_region([S|Shapes], region(Width, Height, [Count|Counts]), X1, Y, Board)
-    ).
+        place(TS, region(Width, Height, [Count|Counts]), Board, Board1)
+    ;   (Count1 = Count, Board1 = Board)
+    ),
+    solve_region([S|Shapes], region(Width, Height, [Count1|Counts]), X1, Y1, Board1).
 
 solve(Shapes, Region) :-
     Region = region(Width, Height, Count),
