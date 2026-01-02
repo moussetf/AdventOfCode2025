@@ -1,14 +1,11 @@
 :- use_module(library(dcg/basics)).
 :- use_module(library(dcg/high_order)).
-:- use_module(library(lists), [sum_list/2, max_list/2, member/2, 
-                               min_list/2, list_to_set/2]).
+:- use_module(library(lists), [sum_list/2, member/2, min_list/2]).
 :- use_module(library(apply), [maplist/2, maplist/3, include/3]).
 :- use_module(library(pure_input), [phrase_from_stream/2]).
 :- use_module(library(yall), [(>>)/3, (>>)/4]).
-:- use_module(library(aggregate), [foreach/2]).
 :- use_module(library(assoc), [get_assoc/3, put_assoc/4, empty_assoc/1]).
-:- use_module(library(solution_sequences), [distinct/1]).
-:- use_module(library(ordsets), [ord_disjoint/2, ord_union/3]).
+:- use_module(library(backcomp), [flush/0]).
 
 % Parser
 parse(Shapes, Regions) -->
@@ -37,30 +34,32 @@ rot90(shape(Number, Coords1), shape(Number, Coords2)) :-
 translate(DX, DY, shape(Number, Coords1), shape(Number, Coords2)) :-
     maplist({DX, DY}/[c(X1, Y1), c(X2, Y2)]>>(X2 is X1 + DX, Y2 is Y1 + DY), Coords1, Coords2).
 
-% Translate the shape so that the top-left coordinate is c(0, 0) and order the coordinate list.
+% Translate the shape so that the top-left coordinate is c(0, 0) and the coordinate list is sorted.
 x(c(X, _), X).
 y(c(_, Y), Y).
-normalize(S1, shape(Number, Coords1)) :-
+normalize(S1, shape(Number, NormCoords)) :-
     S1 = shape(_, Coords),
     maplist(x, Coords, Xs), min_list(Xs, MinX),
     maplist(y, Coords, Ys), min_list(Ys, MinY),
     DX is -MinX,
     DY is -MinY,
-    translate(DX, DY, S1, shape(Number, Coords2)),
-    sort(Coords2, Coords1).
+    translate(DX, DY, S1, shape(Number, Coords1)),
+    sort(Coords1, NormCoords).
 
-% All possible variants of a shape
+% Generate all possible variants of a shape
 variant_ -->
     ([]; flipX; flipY; flipX, flipY; rot90; rot90, flipX; rot90, flipY; rot90, flipX, flipY),
     normalize.
 :- table variant/2.
 variant(S, Var) :- setof(V, variant_(S, V), Vars), member(Var, Vars).
 
-place(shape(_, Coords), region(Width, Height, _), Board1, Board2) :-
-    maplist({Width, Height}/[c(X, Y)]>>(X < Width, Y < Height), Coords),
-    ord_disjoint(Coords, Board1),
-    ord_union(Coords, Board1, Board2).
+place(shape(_, Coords), region(Width, Height, _)) -->
+    { maplist({Width, Height}/[c(X, Y)]>>(X < Width, Y < Height), Coords) },
+    foreach(member(C, Coords), place_coord(C)).
 
+place_coord(C, Board1, Board2) :-
+    \+ get_assoc(C, Board1, _),
+    put_assoc(C, Board1, 1, Board2).
 
 solve_region([_|Shapes], region(Width, Height, [0|Counts]), _, _, Board) :-
     solve_region(Shapes, region(Width, Height, Counts), 0, 0, Board).
@@ -74,7 +73,6 @@ solve_region([S|Shapes], region(Width, Height, [Count|Counts]), X, Y, Board) :-
     Count > 0,
     Width > X, X >= 0,
     Height > Y, Y >= 0,
-    (Height - Y) * Width - X >= 7 * Count,
     X1 is X + 1,
     (
         variant(S, Var),
@@ -87,9 +85,11 @@ solve_region([S|Shapes], region(Width, Height, [Count|Counts]), X, Y, Board) :-
 
 solve(Shapes, Region) :-
     Region = region(Width, Height, Count),
+    % Stupid check that sorts out all the impossible cases...
     sum_list(Count, CountSum),
     Width * Height >= 7*CountSum,
-    solve_region(Shapes, Region, 0, 0, []).
+    empty_assoc(Board),
+    solve_region(Shapes, Region, 0, 0, Board).
 
 main :-
     current_input(Stdin),
@@ -99,17 +99,3 @@ main :-
     length(SolvableRegions, Sol),
     format("~w~n", [Sol]),
     halt.
-
-% Pretty-print the board
-format_region(region(Width, Height, _), Board) :-
-    H1 is Height-1,
-    W1 is Width-1,
-    findall(X-Y, ( between(0, H1, Y), between(0, W1, X) ), Indices),
-    maplist(
-        {W1,Board}/[X-Y]>>(
-            ( member(c(X, Y), Board) ->  format("#", []) ;   format(".", []) ),
-            ( X is W1 -> format("~n"); true )
-        ),
-        Indices
-    ),
-    format("~n").
