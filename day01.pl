@@ -7,6 +7,7 @@ parse(Ns) --> sequence(move, Ns).
 move(N) --> "R", integer(N), blanks.
 move(N) --> "L", integer(M), {N is -M}, blanks.
 
+% Count the number of times the cumulative sum is zero mod 100.
 count_zeroes(Pos, NumZeroes) -->
     [Move],
     { Pos1 is mod(Pos + Move, 100) },
@@ -14,6 +15,8 @@ count_zeroes(Pos, NumZeroes) -->
     count_zeroes(Pos1, NumZeroes1).
 count_zeroes(_, 0) --> eos.
 
+% Count the number of times the cumulative sum "passes" through a
+% multiple of 100.
 count_crossings(Pos, NumCrossings) -->
     [Move],
     { Pos1 is mod(Pos + Move, 100) },

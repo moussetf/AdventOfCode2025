@@ -1,9 +1,11 @@
 :- use_module(library(dcg/basics)).
+:- use_module(library(dcg/high_order)).
+:- use_module(library(clpfd)).
 :- use_module(library(lists)).
 :- use_module(library(pure_input), [phrase_from_stream/2]).
 
-parse([A-B|Ranges]) --> integer(A), "-", integer(B), ",", parse(Ranges).
-parse([A-B]) --> integer(A), "-", integer(B), blanks.
+parse(Ranges) --> sequence(range, ",", Ranges).
+range(A-B) --> integer(A), "-", integer(B), blanks.
 
 % Either the decimal representation of N splits perfectly into K pieces and Fst
 % is the first piece (interpreted as a number), or it doesn't, and then Fst is
@@ -16,13 +18,13 @@ first(N, K, Fst) :-
     ;   Fst is 10^PieceLen
     ).
 
-% True if M is the number obtained by K-fold concatenation of N with itself.
-repeatN(N, K, M) :- repeatN_(N, K, M, 0).
-repeatN_(_, 0, Acc, Acc).
-repeatN_(N, K, M, Acc) :-
-    K > 0, L is K-1,
-    Acc0 is 10^ceil(log10(N+1))*Acc + N,
-    repeatN_(N, L, M, Acc0).
+% True if M is the number obtained by K-fold repetition of the
+% digits of N.
+repeatN(_, 0, 0).
+repeatN(N, K, M) :-
+    K #> 0, L #= K-1, B is 10^ceil(log10(N+1)),
+    M #= B*M0 + N,
+    repeatN(N, L, M0).
 
 % True if N is an invalid number (with multiplicity K) for one of the
 % given ranges.
